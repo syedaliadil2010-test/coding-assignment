@@ -30,5 +30,8 @@ You don’t have to code all of the advanced features! Choose the features you w
 
 *If you have any questions, please don’t hesitate to ask. Asking for clarification is encouraged.
 
+:warning: When you are finished, please update your readme with a description of which features you implemented and your process for solving the problem.
+
 ## Updates: ##
 - 2023-06-08 Added some sample code to serve as a starting point (delete indexed data, index new data, perform simple search on indexed data).
+- 2023-06-19 Added a note to update the readme with their own notes and experience
