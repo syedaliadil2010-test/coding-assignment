@@ -36,4 +36,5 @@ You don’t have to code all (or any) of the advanced features! Please don't sta
 
 ## Updates: ##
 - 2023-06-08 Added some sample code to serve as a starting point (delete indexed data, index new data, perform simple search on indexed data).
-- 2023-06-19 Added a note to update the readme with their own notes and experience
+- 2023-06-19 Added a note to update the readme with their own notes and experience.
+- 2023-09-08 Added notes that advanced features are optional due to reduced time expectations. Added notes about what we're looking for.
