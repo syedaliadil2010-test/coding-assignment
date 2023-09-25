@@ -21,5 +21,19 @@ namespace MarketingCodingAssignment.Models
             get; set;
         }
 
+        public DateOnly? ReleaseDate
+        {
+            get; set;
+        }
+        public decimal? VoteAverage
+        {
+            get; set;
+        }
+
+        public string? Genres
+        {
+            get; set;
+        }
+
     }
 }
