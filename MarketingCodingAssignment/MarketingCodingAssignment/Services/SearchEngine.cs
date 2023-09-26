@@ -64,7 +64,8 @@ namespace MarketingCodingAssignment.Services
                     new TextField("Title", film.Title, Field.Store.YES),
                     new TextField("Overview", film.Overview, Field.Store.YES),
                     new Int32Field("Runtime", film.Runtime, Field.Store.YES),
-                    new TextField("Tagline", film.Tagline, Field.Store.YES)
+                    new TextField("Tagline", film.Tagline, Field.Store.YES),
+                    new Int64Field("Revenue", film.Revenue ?? 0, Field.Store.YES)
                 };
                 writer.AddDocument(doc);
             }
@@ -113,9 +114,6 @@ namespace MarketingCodingAssignment.Services
             // Re-use the writer to get real-time updates
             using var reader = writer.GetReader(applyAllDeletes: true);
             var searcher = new IndexSearcher(reader);
-            //var parser = new QueryParser(AppLuceneVersion, "Title", _analyzer);
-            //var luceneQuery = parser.Parse(searchString);
-            //var topDocs = searcher.Search(luceneQuery, 100);
 
             var hits = searcher.Search(phrase, 25).ScoreDocs;
 
@@ -127,9 +125,13 @@ namespace MarketingCodingAssignment.Services
                 // return a list of films
                 FilmLuceneRecord film = new FilmLuceneRecord
                 {
-                    Id = foundDoc.GetField("Id").ToString(),
-                    Title = foundDoc.GetField("Title").ToString(),
-                    Tagline = foundDoc.GetField("Tagline").ToString()
+                    Id = foundDoc.Get("Id").ToString(),
+                    Title = foundDoc.Get("Title").ToString(),
+                    Overview = foundDoc.Get("Overview").ToString(),
+                    Runtime = int.TryParse(foundDoc.Get("Runtime"), out int parsedRuntime) ? parsedRuntime : 0,
+                    Tagline = foundDoc.Get("Tagline").ToString(),
+                    Revenue = Int64.TryParse(foundDoc.Get("Revenue"), out Int64 parsedRevenue) ? parsedRevenue : 0,
+                    Score = hit.Score
                 };
                 searchResult.Add(film);
 

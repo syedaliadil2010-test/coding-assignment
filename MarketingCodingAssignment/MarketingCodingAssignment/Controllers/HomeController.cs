@@ -63,8 +63,9 @@ namespace MarketingCodingAssignment.Controllers
                 Id = x.Id,
                 Title = x.Title,
                 Overview = x.Overview,
-                Runtime = int.TryParse(x.Runtime, out int parsed) ? parsed : 0,
-                Tagline = x.Tagline
+                Runtime = int.TryParse(x.Runtime, out int parsedRuntime) ? parsedRuntime : 0,
+                Tagline = x.Tagline,
+                Revenue = Int64.TryParse(x.Revenue, out Int64 parsedRevenue) ? parsedRevenue : 0
             }).ToList();
 
             // Write the records to the lucene index

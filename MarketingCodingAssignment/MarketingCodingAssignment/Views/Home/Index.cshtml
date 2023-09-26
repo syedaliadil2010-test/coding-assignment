@@ -25,7 +25,9 @@
         }
 
         .panel-title {
+            padding-top: 1em;
             font-weight: bold;
+            font-size: 20px;
         }
     </style>
 }
@@ -52,7 +54,6 @@
             });
         })
 
-
         // Number of results rows to send back at a time (10).
         var pageRows = 10;
 
@@ -73,6 +74,7 @@
 
         // Initial seach button click (returns the intial set of results).
         $("#searchbutton").on("click", function () {
+            console.log("click");
             if (document.getElementById("searchtext").value) { 
                 $.ajax({
                     type: "get",
@@ -102,21 +104,19 @@
 
             var resultCount = results.length;
 
+            //console.log(item.revenue);
+
             // Loop through the results and format for display.
             for (var i = 0; i < resultCount; ++i) {
-
-                console.log(results);
-
                 var item = results[i];
                 lines.push("<div class='panel panel-primary'>");
-                lines.push("<div class='panel-heading'>");
-                lines.push("<h3 class='panel-title'><a href='https://www.imdb.com/title/" + htmlEncode(item.id) + "'>" + htmlEncode(item.title) + "</a></h3>");
-                lines.push("</div>");
+                lines.push("<div class='panel-heading'><h3 class='panel-title'><a href='https://www.imdb.com/title/" + htmlEncode(item.id) + "'>" + htmlEncode(item.title) + "</a></h3></div>");
                 lines.push("<div class='panel-body'>");
-                if (item.Tagline) lines.push("<div class='tagline'>" + item.Tagline + "</div>");
-                if (item.Overview) lines.push("<div class='overview'>" + item.Overview + "</div>");
-                if (item.ReleaseDate) lines.push("<div>Initially released " + humanDate(item.ReleaseDate) + "</div>");
-                if (item.ProductionCompanies) lines.push("<div>Produced by " + humanList(item.ProductionCompanies) + "</div>");
+                if (item.tagline) lines.push("<div class='tagline'>" + item.tagline + "</div>");
+                if (item.runtime) lines.push("<div> " + item.runtime + " minutes</div>");
+                if (item.revenue) lines.push("<div>Revenue: " + item.revenue + " USD</div>");
+                if (item.releasedate) lines.push("<div>Initially released " + humanDate(item.releasedate) + "</div>");
+                if (item.overview) lines.push("<div class='overview'>" + item.overview + "</div>");
                 lines.push("</div>");
                 lines.push("</div>");
             }
@@ -124,13 +124,12 @@
             // Append the new results.
             $("#searchresults").append(lines.join(""));
 
-
-            // Add a "more" button if there may be more results (e.g. 10 results requested, 10 results returned.)
-            if (resultCount >= pageRows) {
-                $("#searchresults").append("<p>" +
-                    "<button id='moreresults' class='btn btn-success' data-start='" + (start + resultCount) + "'>More Results</button>" +
-                    "</p>");
-            }
+            //// Add a "more" button if there may be more results (e.g. 10 results requested, 10 results returned.)
+            //if (resultCount >= pageRows) {
+            //    $("#searchresults").append("<p>" +
+            //        "<button id='moreresults' class='btn btn-success' data-start='" + (start + resultCount) + "'>More Results</button>" +
+            //        "</p>");
+            //}
         }
 
     </script>
@@ -145,14 +144,14 @@
         <div class="input-group">
             <input id="searchtext" type="search" name="searchtext" placeholder="Type something and press the search button" class="form-control" autocomplete="off">
             <span class="input-group-btn">
-                <button id="searchbutton" class="btn btn-default">
+                <button id="searchbutton" class="btn btn-default" title="Search">
                     <span class="material-symbols-outlined">
                         search
                     </span>
                 </button>
             </span>
             <span class="input-group-btn">
-                <button id="refreshbutton" class="btn btn-default">
+                <button id="refreshbutton" class="btn btn-default" title="Destroy and recreate the index">
                     <span class="material-symbols-outlined">
                         refresh
                     </span>

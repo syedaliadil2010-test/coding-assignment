@@ -27,5 +27,20 @@
             get; set;
         }
 
+        public float? Score
+        {
+            get; set;
+        }
+
+        public Int64? Revenue
+        {
+            get; set;
+        }
+
+        public DateTime? ReleaseDate
+        {
+            get; set;
+        }
+
     }
 }
