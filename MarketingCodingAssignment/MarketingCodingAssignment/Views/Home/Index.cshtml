@@ -2,26 +2,167 @@
     ViewData["Title"] = "Home Page";
 }
 
+@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <style type="text/css">
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24
+        }
+
+        /* CSS styles for search results */
+
+        .panel-body div + div { /* Add padding to the subsequent div*/
+            padding-top: 0.5em
+        }
+
+        .tagline {
+            font-weight: bold;
+        }
+
+        .overview {
+        }
+
+        .panel-title {
+            font-weight: bold;
+        }
+    </style>
+}
+
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+    <script>
+
+        // Delete and recreate the index
+        $("#refreshbutton").on("click", function () {
+            $.ajax({
+                type: "post",
+                url: "/home/reloadindex",
+                success: function (ajaxResponse) {
+                    console.log("Refresh success");
+                },
+                failure: function (ajaxResponse) {
+                    console.log("Refresh fail");
+                },
+                error: function (ajaxResponse) {
+                    console.log("Refresh server error");
+                }
+            });
+        })
 
 
+        // Number of results rows to send back at a time (10).
+        var pageRows = 10;
+
+        // Encode the results
+        var $converter = $("<div>");
+        function htmlEncode(s) {
+            return $converter.text(s).html();
+        }
 
 
+        // If they press the enter key, execute the search
+        $("#searchtext").keydown(function (e) { 
+            if (e.keyCode == 13) {
+                $("#searchbutton").click();
+                e.preventDefault();
+            }
+        });
+
+        // Initial seach button click (returns the intial set of results).
+        $("#searchbutton").on("click", function () {
+            if (document.getElementById("searchtext").value) { 
+                $.ajax({
+                    type: "get",
+                    url: "/home/search?searchString=" + encodeURIComponent($("#searchtext").val()) + "&start=0&rows=" + pageRows,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (ajaxResponse) {
+                        $("#searchresults").empty();
+                        $("#searchresults").append("<p>Records found: " + ajaxResponse.numFound + "</p>");
+                        addResults(0, ajaxResponse.searchResults)
+                    },
+                    failure: function (ajaxResponse) {
+                        document.getElementById("resulttext").textContent = "Failure! " + ajaxResponse.responseText;
+                    },
+                    error: function (ajaxResponse) {
+                        document.getElementById("resulttext").textContent = "Error! " + ajaxResponse.responseText;
+                    }
+                });
+            }
+        });
+
+        // Apply formatting and append new results.
+        function addResults(start, results) {
+
+            // Array where the search results are stored (in preparation for HTML output).
+            var lines = [];
+
+            var resultCount = results.length;
+
+            // Loop through the results and format for display.
+            for (var i = 0; i < resultCount; ++i) {
+
+                console.log(results);
+
+                var item = results[i];
+                lines.push("<div class='panel panel-primary'>");
+                lines.push("<div class='panel-heading'>");
+                lines.push("<h3 class='panel-title'><a href='https://www.imdb.com/title/" + htmlEncode(item.id) + "'>" + htmlEncode(item.title) + "</a></h3>");
+                lines.push("</div>");
+                lines.push("<div class='panel-body'>");
+                if (item.Tagline) lines.push("<div class='tagline'>" + item.Tagline + "</div>");
+                if (item.Overview) lines.push("<div class='overview'>" + item.Overview + "</div>");
+                if (item.ReleaseDate) lines.push("<div>Initially released " + humanDate(item.ReleaseDate) + "</div>");
+                if (item.ProductionCompanies) lines.push("<div>Produced by " + humanList(item.ProductionCompanies) + "</div>");
+                lines.push("</div>");
+                lines.push("</div>");
+            }
+
+            // Append the new results.
+            $("#searchresults").append(lines.join(""));
 
 
+            // Add a "more" button if there may be more results (e.g. 10 results requested, 10 results returned.)
+            if (resultCount >= pageRows) {
+                $("#searchresults").append("<p>" +
+                    "<button id='moreresults' class='btn btn-success' data-start='" + (start + resultCount) + "'>More Results</button>" +
+                    "</p>");
+            }
+        }
+
+    </script>
 
 }
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-
 <div class="text-center">
-    <h1 class="display-4">Search</h1>
-    <span>
-        <input type="search">
-    </span>
+    <h1 class="display-4">Film Search</h1>
 </div>
-
-
-
-
+<div style="max-width: 50em; margin: 0 auto">
+    <div class="autocomplete">
+        <div class="input-group">
+            <input id="searchtext" type="search" name="searchtext" placeholder="Type something and press the search button" class="form-control" autocomplete="off">
+            <span class="input-group-btn">
+                <button id="searchbutton" class="btn btn-default">
+                    <span class="material-symbols-outlined">
+                        search
+                    </span>
+                </button>
+            </span>
+            <span class="input-group-btn">
+                <button id="refreshbutton" class="btn btn-default">
+                    <span class="material-symbols-outlined">
+                        refresh
+                    </span>
+                </button>
+            </span>
+        </div>
+    </div>
+    <div id="searchresults" style="margin-top: 1em">
+    </div>
+    <div>
+        <span id="resulttext"></span>
+    </div>
+</div>
