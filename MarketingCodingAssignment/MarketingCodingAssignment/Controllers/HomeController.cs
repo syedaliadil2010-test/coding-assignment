@@ -8,7 +8,7 @@ namespace MarketingCodingAssignment.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private SearchEngine _searchEngine;
+        private readonly SearchEngine _searchEngine;
 
         public HomeController(ILogger<HomeController> logger)
         {
@@ -33,9 +33,6 @@ namespace MarketingCodingAssignment.Controllers
             var searchResults = _searchEngine.Search(searchString, start, rows);
             return Json(new {searchResults});
         }
-
-
-
 
         [HttpPost]
         public void ReloadIndex()
