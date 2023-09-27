@@ -79,23 +79,6 @@
             $(".loading-overlay").fadeOut();
         }
 
-        // Delete and recreate the index
-        $("#refreshbutton").on("click", function () {
-            $.ajax({
-                type: "post",
-                url: "/home/reloadindex",
-                success: function (ajaxResponse) {
-                    console.log("Refresh success");
-                },
-                failure: function (ajaxResponse) {
-                    console.log("Refresh fail");
-                },
-                error: function (ajaxResponse) {
-                    console.log("Refresh server error");
-                }
-            });
-        })
-
         // Number of results rows to send back at a time (10).
         var currentPage = 0;
         var rowsPerPage = 10;
@@ -129,9 +112,10 @@
         $("#durationMinimumFacet, #durationMaximumFacet, #voteAverageMinimumFacet").on("change", function () {
             updateSearchAndResetCount();
         });
-		updateSearchAndResetCount();
+        updateSearchAndResetCount();
 
         function updateSearch() {
+            showLoadingOverlay();
             $.ajax({
                 type: "get",
                 url: "/home/search?searchString=" + encodeURIComponent($("#searchtext").val()) + "&start=" + currentPage + "&rows=" + rowsPerPage,
@@ -141,9 +125,6 @@
                     voteAverageMinimum: document.getElementById("voteAverageMinimumFacet").value,
                     durationMinimum: document.getElementById("durationMinimumFacet").value,
                     durationMaximum: document.getElementById("durationMaximumFacet").value
-                },
-                beforeSend: function () {
-                    showLoadingOverlay();
                 },
                 success: function (ajaxResponse) {
                     console.log(ajaxResponse);
@@ -189,7 +170,7 @@
                     lines.push("</div>");
                 }
 
-				if (item.releaseDate) lines.push("<div>Initially released " + new Date(item.releaseDate).toLocaleDateString() + "</div>");
+                if (item.releaseDate) lines.push("<div>Initially released " + new Date(item.releaseDate).toLocaleDateString() + "</div>");
                 if (item.overview) lines.push("<div class='overview'>" + item.overview + "</div>");
                 lines.push("</div>");
                 lines.push("</div>");
@@ -202,7 +183,6 @@
 
         $("#previous-button").on("click", function () {
             if (currentPage > 0) {
-                showLoadingOverlay();
                 currentPage--;
                 updateSearch();
                 $("#nextPage").prop("disabled", false);
@@ -210,12 +190,10 @@
             if (currentPage === 1) {
                 $("#previousPage").prop("disabled", true);
             }
-            hideLoadingOverlay();
         });
 
         $("#next-button").on("click", function () {
             if (rowCount >= (currentPage + 1) * rowsPerPage) {
-                showLoadingOverlay();
                 currentPage++;
                 updateSearch();
                 $("#previousPage").prop("disabled", false);
@@ -223,7 +201,6 @@
             else {
                 $("#nextPage").prop("disabled", true);
             }
-            hideLoadingOverlay();
         });
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -245,13 +222,6 @@
                 <button id="searchbutton" class="btn btn-default" title="Search">
                     <span class="material-symbols-outlined">
                         search
-                    </span>
-                </button>
-            </span>
-            <span class="input-group-btn">
-                <button id="refreshbutton" class="btn btn-default" title="Destroy and recreate the index">
-                    <span class="material-symbols-outlined">
-                        refresh
                     </span>
                 </button>
             </span>
