@@ -128,25 +128,10 @@ namespace MarketingCodingAssignment.Services
             int hitsLimit = 1000;
             TopScoreDocCollector collector = TopScoreDocCollector.Create(hitsLimit, true);
 
-            // If there's no search string, just return everything.
-            var pq = new MultiPhraseQuery();
+            var query = this.GetLuceneQuery(searchString, durationMinimum, durationMaximum, voteAverageMinimum);
 
-            foreach(var word in searchString.Split(" ").Where(s => !String.IsNullOrWhiteSpace(s)))
-            {
-                pq.Add(new Term("CombinedText", word.ToLowerInvariant()));
-            }
+            searcher.Search(query, collector);
 
-            Query rq = NumericRangeQuery.NewInt32Range("Runtime", durationMinimum, durationMaximum, true, true);
-            Query vaq = NumericRangeQuery.NewDoubleRange("VoteAverage",0.0, 10.0, true, true);
-
-            // Apply the filters.
-            BooleanQuery bq = new()
-            {
-                { pq, Occur.MUST },
-                { rq, Occur.MUST }
-            };
-
-            searcher.Search(bq, collector);
             int startIndex = (startPage) * rowsPerPage;
             TopDocs hits = collector.GetTopDocs(startIndex, rowsPerPage);
             ScoreDoc[] scoreDocs = hits.ScoreDocs;
@@ -177,7 +162,32 @@ namespace MarketingCodingAssignment.Services
 
             return searchResults;
         }
+        private Query GetLuceneQuery(string searchString, int? durationMinimum, int? durationMaximum, double? voteAverageMinimum)
+        {
+            if (string.IsNullOrWhiteSpace(searchString))
+            {
+                // If there's no search string, just return everything.
+                return new MatchAllDocsQuery();
+            }
 
+            var pq = new MultiPhraseQuery();
+            foreach (var word in searchString.Split(" ").Where(s => !string.IsNullOrWhiteSpace(s)))
+            {
+                pq.Add(new Term("CombinedText", word.ToLowerInvariant()));
+            }
+
+            Query rq = NumericRangeQuery.NewInt32Range("Runtime", durationMinimum, durationMaximum, true, true);
+            Query vaq = NumericRangeQuery.NewDoubleRange("VoteAverage", 0.0, 10.0, true, true);
+
+            // Apply the filters.
+            BooleanQuery bq = new()
+            {
+                { pq, Occur.MUST },
+                { rq, Occur.MUST }
+            };
+
+            return bq;
+        }
     }
 }
 

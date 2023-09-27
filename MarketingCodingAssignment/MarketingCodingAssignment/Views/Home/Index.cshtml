@@ -128,44 +128,42 @@
 
         $("#durationMinimumFacet, #durationMaximumFacet, #voteAverageMinimumFacet").on("change", function () {
             updateSearchAndResetCount();
-        });        
+        });
+		updateSearchAndResetCount();
 
         function updateSearch() {
-            if (document.getElementById("searchtext").value) {
+            $.ajax({
+                type: "get",
+                url: "/home/search?searchString=" + encodeURIComponent($("#searchtext").val()) + "&start=" + currentPage + "&rows=" + rowsPerPage,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: {
+                    voteAverageMinimum: document.getElementById("voteAverageMinimumFacet").value,
+                    durationMinimum: document.getElementById("durationMinimumFacet").value,
+                    durationMaximum: document.getElementById("durationMaximumFacet").value
+                },
+                beforeSend: function () {
+                    showLoadingOverlay();
+                },
+                success: function (ajaxResponse) {
+                    console.log(ajaxResponse);
+                    rowCount = ajaxResponse.searchResults.recordsCount;
+                    var startRow = currentPage * rowsPerPage;
+                    var calculatedEndRow = (currentPage + 1) * rowsPerPage;
+                    var endRow = rowCount < calculatedEndRow ? rowCount : calculatedEndRow;
+                    $("#showing-records").empty();
+                    $("#showing-records").append("<em>Showing records " + startRow + "  to " + endRow + " out of " + rowCount + " </em>");
 
-                $.ajax({
-                    type: "get",
-                    url: "/home/search?searchString=" + encodeURIComponent($("#searchtext").val()) + "&start=" + currentPage + "&rows=" + rowsPerPage,
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    data: {
-                        voteAverageMinimum: document.getElementById("voteAverageMinimumFacet").value,
-                        durationMinimum: document.getElementById("durationMinimumFacet").value,
-                        durationMaximum: document.getElementById("durationMaximumFacet").value
-                    },
-                    beforeSend: function () {
-                        showLoadingOverlay();
-                    },
-                    success: function (ajaxResponse) {
-                        console.log(ajaxResponse);
-                        rowCount = ajaxResponse.searchResults.recordsCount;
-                        var startRow = currentPage * rowsPerPage;
-                        var calculatedEndRow = (currentPage + 1) * rowsPerPage;
-                        var endRow = rowCount < calculatedEndRow ? rowCount : calculatedEndRow;
-                        $("#showing-records").empty();
-                        $("#showing-records").append("<em>Showing records " + startRow + "  to " + endRow + " out of " + rowCount + " </em>");
-
-                        addResults(0, ajaxResponse.searchResults.films);
-                        hideLoadingOverlay();
-                    },
-                    failure: function (ajaxResponse) {
-                        document.getElementById("errortext").textContent = "Failure! " + ajaxResponse.responseText;
-                    },
-                    error: function (ajaxResponse) {
-                        document.getElementById("errortext").textContent = "Error! " + ajaxResponse.responseText;
-                    }
-                });
-            }
+                    addResults(0, ajaxResponse.searchResults.films);
+                    hideLoadingOverlay();
+                },
+                failure: function (ajaxResponse) {
+                    document.getElementById("errortext").textContent = "Failure! " + ajaxResponse.responseText;
+                },
+                error: function (ajaxResponse) {
+                    document.getElementById("errortext").textContent = "Error! " + ajaxResponse.responseText;
+                }
+            });
         }
 
         // Apply formatting and append new results.
