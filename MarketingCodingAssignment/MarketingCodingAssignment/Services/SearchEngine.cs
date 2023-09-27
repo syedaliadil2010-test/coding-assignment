@@ -9,7 +9,7 @@ using MarketingCodingAssignment.Models;
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
-
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace MarketingCodingAssignment.Services
 {
@@ -41,6 +41,29 @@ namespace MarketingCodingAssignment.Services
             return records;
         }
 
+        // Read the data from the csv and feed it into the lucene index
+        public void PopulateIndexFromCsv()
+        {
+            // Get the list of films from the csv file
+            var csvFilms = ReadFilmsFromCsv();
+
+            // Convert to Lucene format
+            List<FilmLuceneRecord> luceneFilms = csvFilms.Select(x => new FilmLuceneRecord
+            {
+                Id = x.Id,
+                Title = x.Title,
+                Overview = x.Overview,
+                Runtime = int.TryParse(x.Runtime, out int parsedRuntime) ? parsedRuntime : 0,
+                Tagline = x.Tagline,
+                Revenue = Int64.TryParse(x.Revenue, out Int64 parsedRevenue) ? parsedRevenue : 0
+            }).ToList();
+
+            // Write the records to the lucene index
+            PopulateIndex(luceneFilms);
+
+            return;
+        }
+
         public void PopulateIndex(List<FilmLuceneRecord> films)
         {
             // Construct a machine-independent path for the index
@@ -65,7 +88,8 @@ namespace MarketingCodingAssignment.Services
                     new TextField("Overview", film.Overview, Field.Store.YES),
                     new Int32Field("Runtime", film.Runtime, Field.Store.YES),
                     new TextField("Tagline", film.Tagline, Field.Store.YES),
-                    new Int64Field("Revenue", film.Revenue ?? 0, Field.Store.YES)
+                    new Int64Field("Revenue", film.Revenue ?? 0, Field.Store.YES),
+                    new TextField("CombinedText", film.Title + film.Tagline + film.Overview, Field.Store.NO)
                 };
                 writer.AddDocument(doc);
             }
@@ -91,55 +115,66 @@ namespace MarketingCodingAssignment.Services
         }
 
 
-        public IEnumerable<FilmLuceneRecord> Search(string searchString, int start, int rows)
+        public SearchResultsViewModel Search(string searchString, int startPage, int rowsPerPage)
         {
             // Construct a machine-independent path for the index
-            var basePath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            var indexPath = Path.Combine(basePath, "index");
+            string basePath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            string indexPath = Path.Combine(basePath, "index");
             using var dir = FSDirectory.Open(indexPath);
 
             // Create an analyzer to process the text
-            var analyzer = new StandardAnalyzer(AppLuceneVersion);
+            StandardAnalyzer analyzer = new(AppLuceneVersion);
 
             // Create an index writer
-            var indexConfig = new IndexWriterConfig(AppLuceneVersion, analyzer);
-            using var writer = new IndexWriter(dir, indexConfig);
+            IndexWriterConfig indexConfig = new(AppLuceneVersion, analyzer);
+            using IndexWriter writer = new(dir, indexConfig);
 
             // Search with a phrase
-            var phrase = new PhraseQuery
+            PhraseQuery query = new()
             {
-                new Term("Tagline", searchString)
+                new Term("CombinedText", searchString)
             };
 
             // Re-use the writer to get real-time updates
-            using var reader = writer.GetReader(applyAllDeletes: true);
-            var searcher = new IndexSearcher(reader);
+            using DirectoryReader reader = writer.GetReader(applyAllDeletes: true);
+            IndexSearcher searcher = new(reader);
+            TopScoreDocCollector collector = TopScoreDocCollector.Create(1000, true);
 
-            var hits = searcher.Search(phrase, 25).ScoreDocs;
+            int startIndex = (startPage) * rowsPerPage;
 
-            var searchResult = new List<FilmLuceneRecord>();
-            foreach (var hit in hits)
+            //Query query = new QueryParser(Version.LUCENE_48, "All", analyzer).parse(searchQuery);
+            searcher.Search(query, collector);
+            int endIndex = startIndex + rowsPerPage;
+            TopDocs hits = collector.GetTopDocs(startIndex, rowsPerPage); 
+            var scoreDocs = hits.ScoreDocs;
+
+            List<FilmLuceneRecord> films = new();
+            foreach (ScoreDoc? hit in scoreDocs)
             {
-                var foundDoc = searcher.Doc(hit.Doc);
-
-                // return a list of films
-                FilmLuceneRecord film = new FilmLuceneRecord
+                Document foundDoc = searcher.Doc(hit.Doc);
+                FilmLuceneRecord film = new()
                 {
                     Id = foundDoc.Get("Id").ToString(),
                     Title = foundDoc.Get("Title").ToString(),
                     Overview = foundDoc.Get("Overview").ToString(),
                     Runtime = int.TryParse(foundDoc.Get("Runtime"), out int parsedRuntime) ? parsedRuntime : 0,
                     Tagline = foundDoc.Get("Tagline").ToString(),
-                    Revenue = Int64.TryParse(foundDoc.Get("Revenue"), out Int64 parsedRevenue) ? parsedRevenue : 0,
+                    Revenue = long.TryParse(foundDoc.Get("Revenue"), out long parsedRevenue) ? parsedRevenue : 0,
                     Score = hit.Score
                 };
-                searchResult.Add(film);
+                films.Add(film);
 
             }
 
-            return searchResult.ToList();
-        }
+            SearchResultsViewModel searchResults = new()
+            {
+                RecordsCount = hits.TotalHits,
+                Films = films.ToList()
+            };
 
+            return searchResults;
+        }
 
     }
 }
+

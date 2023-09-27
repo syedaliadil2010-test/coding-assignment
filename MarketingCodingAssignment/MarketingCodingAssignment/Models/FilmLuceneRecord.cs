@@ -32,7 +32,7 @@
             get; set;
         }
 
-        public Int64? Revenue
+        public long? Revenue
         {
             get; set;
         }

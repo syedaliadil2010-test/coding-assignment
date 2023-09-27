@@ -31,10 +31,11 @@ namespace MarketingCodingAssignment.Controllers
         public JsonResult Search(String searchString, int start, int rows)
         {
             var searchResults = _searchEngine.Search(searchString, start, rows);
-
-            return Json(new {searchResults, numFound = searchResults.Count() });
-
+            return Json(new {searchResults});
         }
+
+
+
 
         [HttpPost]
         public void ReloadIndex()
@@ -54,28 +55,9 @@ namespace MarketingCodingAssignment.Controllers
         // Read the data from the csv and feed it into the lucene index
         public void PopulateIndex()
         {
-            // Get the list of films from the csv file
-            var csvFilms = _searchEngine.ReadFilmsFromCsv();
-
-            // Convert to Lucene format
-            List<FilmLuceneRecord> luceneFilms = csvFilms.Select(x => new FilmLuceneRecord
-            {
-                Id = x.Id,
-                Title = x.Title,
-                Overview = x.Overview,
-                Runtime = int.TryParse(x.Runtime, out int parsedRuntime) ? parsedRuntime : 0,
-                Tagline = x.Tagline,
-                Revenue = Int64.TryParse(x.Revenue, out Int64 parsedRevenue) ? parsedRevenue : 0
-            }).ToList();
-
-            // Write the records to the lucene index
-            _searchEngine.PopulateIndex(luceneFilms);
-
+            _searchEngine.PopulateIndexFromCsv();
             return;
         }
-
-
-
 
     }
 }
