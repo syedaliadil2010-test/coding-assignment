@@ -122,19 +122,19 @@ namespace MarketingCodingAssignment.Services
             string basePath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             string indexPath = Path.Combine(basePath, "index");
             using FSDirectory dir = FSDirectory.Open(indexPath);
-			using DirectoryReader reader = DirectoryReader.Open(dir);
-			IndexSearcher searcher = new(reader);
+            using DirectoryReader reader = DirectoryReader.Open(dir);
+            IndexSearcher searcher = new(reader);
 
             int hitsLimit = 1000;
             TopScoreDocCollector collector = TopScoreDocCollector.Create(hitsLimit, true);
 
-			// If there's no search string, just return everything.
-			var pq = new MultiPhraseQuery();
+            // If there's no search string, just return everything.
+            var pq = new MultiPhraseQuery();
 
-			foreach(var word in searchString.Split(" ").Where(s => !String.IsNullOrWhiteSpace(s)))
-			{
-				pq.Add(new Term("CombinedText", word.ToLowerInvariant()));
-			}
+            foreach(var word in searchString.Split(" ").Where(s => !String.IsNullOrWhiteSpace(s)))
+            {
+                pq.Add(new Term("CombinedText", word.ToLowerInvariant()));
+            }
 
             Query rq = NumericRangeQuery.NewInt32Range("Runtime", durationMinimum, durationMaximum, true, true);
             Query vaq = NumericRangeQuery.NewDoubleRange("VoteAverage",0.0, 10.0, true, true);
