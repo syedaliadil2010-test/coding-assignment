@@ -7,6 +7,11 @@
             get; set;
         }
 
+        public float? Score
+        {
+            get; set;
+        }
+
         public string? Title
         {
             get; set;
@@ -27,11 +32,6 @@
             get; set;
         }
 
-        public float? Score
-        {
-            get; set;
-        }
-
         public long? Revenue
         {
             get; set;
@@ -41,6 +41,12 @@
         {
             get; set;
         }
+
+        public double? VoteAverage
+        {
+            get; set;
+        }
+
 
     }
 }

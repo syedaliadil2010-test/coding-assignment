@@ -126,13 +126,23 @@
             updateSearch();
         }
 
+        $("#durationMinimumFacet, #durationMaximumFacet, #voteAverageMinimumFacet").on("change", function () {
+            updateSearchAndResetCount();
+        });        
+
         function updateSearch() {
             if (document.getElementById("searchtext").value) {
+
                 $.ajax({
                     type: "get",
                     url: "/home/search?searchString=" + encodeURIComponent($("#searchtext").val()) + "&start=" + currentPage + "&rows=" + rowsPerPage,
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
+                    data: {
+                        voteAverageMinimum: document.getElementById("voteAverageMinimumFacet").value,
+                        durationMinimum: document.getElementById("durationMinimumFacet").value,
+                        durationMaximum: document.getElementById("durationMaximumFacet").value
+                    },
                     beforeSend: function () {
                         showLoadingOverlay();
                     },
@@ -250,25 +260,50 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="revenueFacet">Minimum Rating</label>
-        <select id="revenueFacet" class="form-control" style="display: block; width: 150px">
-            <option value="0.0">0.0</option>
-            <option value="1.0">1.0</option>
-            <option value="2.0">2.0</option>
-            <option value="3.0">3.0</option>
-            <option value="4.0">4.0</option>
-            <option value="5.0">5.0</option>
-            <option value="6.0">6.0</option>
-            <option value="7.0">7.0</option>
-            <option value="8.0">8.0</option>
-            <option value="9.0">9.0</option>
-            <option value="10.0">10.0</option>
-        </select>
+        <div style="display:inline-block;">
+            <label for="durationMinimumFacet">Duration (Minimum)</label>
+            <select id="durationMinimumFacet" class="form-control" style="display: block; width: 150px">
+                <option value="0">0</option>
+                <option value="30">30</option>
+                <option value="60">60</option>
+                <option value="120">120</option>
+                <option value="180">180</option>
+                <option value="240">240</option>
+            </select>
+        </div>
+        <div style="display:inline-block;">
+            <label for="durationMaximumFacet">Duration (Maximum)</label>
+            <select id="durationMaximumFacet" class="form-control" style="display: block; width: 150px">
+                <option value="0">0</option>
+                <option value="30">30</option>
+                <option value="60">60</option>
+                <option value="120">120</option>
+                <option value="180">180</option>
+                <option value="240">240</option>
+                <option selected value="1000">1000</option>
+            </select>
+        </div>
+        <div style="display:inline-block;">
+            <label for="voteAverageMinimumFacet">Vote Average (Minimum)</label>
+            <select id="voteAverageMinimumFacet" class="form-control" style="display: block; width: 150px">
+                <option value="0.0">0.0</option>
+                <option value="1.0">1.0</option>
+                <option value="2.0">2.0</option>
+                <option value="3.0">3.0</option>
+                <option value="4.0">4.0</option>
+                <option value="5.0">5.0</option>
+                <option value="6.0">6.0</option>
+                <option value="7.0">7.0</option>
+                <option value="8.0">8.0</option>
+                <option value="9.0">9.0</option>
+                <option value="10.0">10.0</option>
+            </select>
+        </div>
     </div>
     <div id="results-count" style="margin-top: 30px">
         <span>
             <span><button id='previous-button' class='btn btn-default' title='Previous'><span class='material-symbols-outlined'>arrow_back_ios</span></button></span>
-            <span id='showing-records'></span>
+            <span id='showing-records'><em>Showing records 0  to 0 out of 0 </em></span>
             <span><button id='next-button' class='btn btn-default' title='Next'><span class='material-symbols-outlined'>arrow_forward_ios</span></button></span>
         </span>
     </div>

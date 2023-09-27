@@ -10,9 +10,6 @@ using MarketingCodingAssignment.Models;
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Lucene.Net.Search.Similarities;
-using static System.Net.Mime.MediaTypeNames;
-using System.Runtime.InteropServices;
 
 namespace MarketingCodingAssignment.Services
 {
@@ -58,7 +55,8 @@ namespace MarketingCodingAssignment.Services
                 Overview = x.Overview,
                 Runtime = int.TryParse(x.Runtime, out int parsedRuntime) ? parsedRuntime : 0,
                 Tagline = x.Tagline,
-                Revenue = long.TryParse(x.Revenue, out long parsedRevenue) ? parsedRevenue : 0
+                Revenue = long.TryParse(x.Revenue, out long parsedRevenue) ? parsedRevenue : 0,
+                VoteAverage = double.TryParse(x.VoteAverage, out double parsedVoteAverage) ? parsedVoteAverage : 0
             }).ToList();
 
             // Write the records to the lucene index
@@ -92,6 +90,7 @@ namespace MarketingCodingAssignment.Services
                     new Int32Field("Runtime", film.Runtime, Field.Store.YES),
                     new TextField("Tagline", film.Tagline, Field.Store.YES),
                     new Int64Field("Revenue", film.Revenue ?? 0, Field.Store.YES),
+                    new DoubleField("VoteAverage", film.VoteAverage ?? 0.0, Field.Store.YES),
                     new TextField("CombinedText", film.Title + film.Tagline + film.Overview, Field.Store.NO)
                 };
                 writer.AddDocument(doc);
@@ -117,7 +116,7 @@ namespace MarketingCodingAssignment.Services
             return;
         }
 
-        public SearchResultsViewModel Search(string searchString, int startPage, int rowsPerPage)
+        public SearchResultsViewModel Search(string searchString, int startPage, int rowsPerPage, int? durationMinimum, int? durationMaximum, double? voteAverageMinimum)
         {
             // Construct a machine-independent path for the index
             string basePath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
@@ -140,8 +139,10 @@ namespace MarketingCodingAssignment.Services
                 {
                     new Term("CombinedText", searchString.ToLowerInvariant())
                 };
-            Query rq = NumericRangeQuery.NewInt32Range("Runtime", 100, 500, true, true);
+            Query rq = NumericRangeQuery.NewInt32Range("Runtime", durationMinimum, durationMaximum, true, true);
+            Query vaq = NumericRangeQuery.NewDoubleRange("VoteAverage",0.0, 10.0, true, true);
 
+            // Apply the filters.
             BooleanQuery bq = new()
             {
                 { pq, Occur.MUST },
@@ -165,6 +166,7 @@ namespace MarketingCodingAssignment.Services
                     Runtime = int.TryParse(foundDoc.Get("Runtime"), out int parsedRuntime) ? parsedRuntime : 0,
                     Tagline = foundDoc.Get("Tagline").ToString(),
                     Revenue = long.TryParse(foundDoc.Get("Revenue"), out long parsedRevenue) ? parsedRevenue : 0,
+                    VoteAverage =  double.TryParse(foundDoc.Get("VoteAverage"), out double parsedVoteAverage) ? parsedVoteAverage : 0.0,
                     Score = hit.Score
                 };
                 films.Add(film);
