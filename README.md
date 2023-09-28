@@ -3,7 +3,7 @@
 
 This .NET Core demo app uses [Lucene.NET](https://lucenenet.apache.org/) to index data from the included FilmsInfo.csv file into a search engine. When you run the app, press the reload button to load the data into the search engine. After that, you can enter seach terms and press the search button to search for matching movie results. 
 
-This coding test should take 2 hours. For this test, add as many of the basic features as possible in the time allotted. If you have extra time, select one of the advanced features to implement. 
+This coding test should take 2 hours. For this test, add as many of the basic features as possible in the time allotted. If you have extra time, select one of the advanced features to implement. If you wish to include extra JavaScript libraries, feel free to use a CDN.
 
 ## Basic Features: :seedling: ##
 1. Display **Voting Average** in the returned search results.
@@ -24,8 +24,6 @@ This coding test should take 2 hours. For this test, add as many of the basic fe
 - Can you design something that is easy-to-use and visually pleasing?
 - Can you use version control correctly?
 - Can you follow instructions and meet scope requirements?
-
-*If you have any questions, please don’t hesitate to ask. Asking for clarification is encouraged.
 
 :warning: When you are finished, please update your readme with a description of which features you implemented and your process for solving the problem.
 
