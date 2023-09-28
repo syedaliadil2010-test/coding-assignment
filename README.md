@@ -6,9 +6,9 @@ This .NET Core demo app uses [Lucene.NET](https://lucenenet.apache.org/) to inde
 This coding test should take 2 hours. For this test, add as many of the basic features as possible in the time allotted. If you have extra time, select one of the advanced features to implement. 
 
 ## Basic Features: :seedling: ##
-1. Display Voting Average in the returned search results.
-1. Add Release Date to the index and display it in the returned search results. _(:bulb: Hint: You will need to reload the index after making changes to the indexing code.)_
-1. Add a way to filter the search by date range.
+1. Display **Voting Average** in the returned search results.
+1. Add **Release Date** to the index and display it in the returned search results. _(:bulb: Hint: You will need to reload the index after making changes to the indexing code.)_
+1. Add a way to filter the search by date range for **Release Date**.
 1. Show off your css skills - improve the styling and layout of the page and/or search results. 
 
 ## Advanced Features: :mortar_board: ##
