@@ -10,6 +10,7 @@ using MarketingCodingAssignment.Models;
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Lucene.Net.Analysis.En;
 
 namespace MarketingCodingAssignment.Services
 {
@@ -173,7 +174,10 @@ namespace MarketingCodingAssignment.Services
             var pq = new MultiPhraseQuery();
             foreach (var word in searchString.Split(" ").Where(s => !string.IsNullOrWhiteSpace(s)))
             {
-                pq.Add(new Term("CombinedText", word.ToLowerInvariant()));
+                if (!EnglishAnalyzer.DefaultStopSet.Contains(word))
+                {
+                    pq.Add(new Term("CombinedText", word.ToLowerInvariant()));
+                }
             }
 
             Query rq = NumericRangeQuery.NewInt32Range("Runtime", durationMinimum, durationMaximum, true, true);
