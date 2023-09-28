@@ -19,7 +19,6 @@ This coding test should take 2 hours. For this test, add as many of the basic fe
 ## We’re looking for the following: :eyeglasses: ##
 
 - Can you research and learn something new that you might not be entirely familiar with?
-- Can you ask the right questions to get what you need?
 - Can you manage your time effectively to deliver something of value? 
 - Can you design something that is easy-to-use and visually pleasing?
 - Can you use version control correctly?
