@@ -1,24 +1,20 @@
-# Marketing Coding Assignment #
-
-A short coding assignment for prospective new hires. 
-
+# Marketing Coding Test #
 ## The Challenge: Build a Web-based Search App ##
 
-Using [Lucene.NET](https://lucenenet.apache.org/) and .NET Core, build an easy-to-use and visually pleasing web-based search application.
+This .NET Core demo app uses [Lucene.NET](https://lucenenet.apache.org/) to index data from the included FilmsInfo.csv file into a search engine. When you run the app, press the reload button to load the data into the search engine. After that, you can enter seach terms and press the search button to search for matching movie results. 
+
+This coding test should take 2 hours. For this test, add as many of the basic features as possible in the time allotted. If you have extra time, select one of the advanced features to implement. 
 
 ## Basic Features: :seedling: ##
-- For test data, use the included movies.csv file.
-- The website should load and index the test data.
-- The app should allow the user to enter keywords and find your indexed content.
-- Your app should also feature a responsive design to ensure it renders well for a variety of screen sizes and resolutions.
+1. Display Voting Average in the returned search results.
+1. Add Release Date to the index and display it in the returned search results. _(:bulb: Hint: You will need to reload the index after making changes to the indexing code.)_
+1. Add a way to filter the search by date range.
+1. Show off your css skills - improve the styling and layout of the page and/or search results. 
 
-## Advanced Features (Optional): :mortar_board: ##
-- Faceting - Provide faceting options for the user to filter by (for example, the ability to search by the date when the film was released).
-- Stemming - when searching for “engineer”, the search should also return results for “engineering”, “engineers”, and “engineered”.
-- Spell checking - present corrected search terms for user misspellings.
-- Auto-complete - suggest search terms as the user types in the search box.
-
-You don’t have to code all (or any) of the advanced features! Please don't start on these unless the basic features are working. If you have extra time, choose the advanced features you want to implement – the scope can be as simple or complex as you want, but we want to see polish. We leave it a little ambiguous on purpose; feel free to be creative and show us how you like to design and write code.
+## Advanced Features: :mortar_board: ##
+1. Autocomplete  - suggest search terms as the user types in the search box.
+1. Stemming - when searching for “engineer”, the search should also return results for “engineering”, “engineers”, and “engineered”.
+1. Spell checking - present corrected search terms for user misspellings.
 
 ## We’re looking for the following: :eyeglasses: ##
 
