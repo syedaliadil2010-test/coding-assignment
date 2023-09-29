@@ -7,6 +7,7 @@ This coding test should take 2 hours. For this test, add as many of the basic fe
 
 ## Basic Features: :seedling: ##
 1. Display **Voting Average** in the returned search results.
+2. Finsh conecting the **Voting Average (Minimum)** so that it filters the results that are below the minimum selected values. 
 1. Add **Release Date** to the index and display it in the returned search results. _(:bulb: Hint: You will need to reload the index after making changes to the indexing code.)_
 1. Add a way to filter the search by date range for **Release Date**.
 1. Show off your css skills - improve the styling and layout of the page and/or search results. 
@@ -24,7 +25,7 @@ This coding test should take 2 hours. For this test, add as many of the basic fe
 - Can you use version control correctly?
 - Can you follow instructions and meet scope requirements?
 
-:warning: When you are finished, please update your readme with a description of which features you implemented and your process for solving the problem.
+:warning: When you are finished, please update your readme with a description of which features you implemented and any feedback on the test.
 
 ## Updates: ##
 - 2023-06-08 Added some sample code to serve as a starting point (delete indexed data, index new data, perform simple search on indexed data).
