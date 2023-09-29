@@ -140,7 +140,6 @@ namespace MarketingCodingAssignment.Services
                     new Term("CombinedText", searchString.ToLowerInvariant())
                 };
             Query rq = NumericRangeQuery.NewInt32Range("Runtime", durationMinimum, durationMaximum, true, true);
-            Query vaq = NumericRangeQuery.NewDoubleRange("VoteAverage",0.0, 10.0, true, true);
 
             // Apply the filters.
             BooleanQuery bq = new()
