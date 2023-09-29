@@ -5,6 +5,8 @@ This .NET Core demo app uses [Lucene.NET](https://lucenenet.apache.org/) to inde
 
 This coding test should take 2 hours. For this test, add as many of the basic features as possible in the time allotted. If you have extra time, select one of the advanced features to implement. If you wish to include extra JavaScript libraries, feel free to use a CDN.
 
+Recommended Tools: Visual Studio 2022, .NET SDK 6.0
+
 ## Basic Features: :seedling: ##
 1. Display **Voting Average** in the returned search results.
 2. Finsh conecting the **Voting Average (Minimum)** so that it filters the results that are below the minimum selected values. 
