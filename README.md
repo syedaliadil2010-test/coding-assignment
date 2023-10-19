@@ -1,5 +1,5 @@
 # Marketing Coding Test #
-## The Challenge: Build a Web-based Search App ##
+## The Challenge: Modify a Web-based Search App ##
 
 This .NET Core demo app uses [Lucene.NET](https://lucenenet.apache.org/) to index data from the included FilmsInfo.csv file into a search engine. When you run the app, press the reload button to load the data into the search engine. After that, you can enter seach terms and press the search button to search for matching movie results. 
 
