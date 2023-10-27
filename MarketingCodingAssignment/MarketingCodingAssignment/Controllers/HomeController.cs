@@ -34,12 +34,11 @@ namespace MarketingCodingAssignment.Controllers
             return Json(new {searchResults});
         }
 
-        [HttpPost]
-        public void ReloadIndex()
+        public ActionResult ReloadIndex()
         {
             DeleteIndex();
             PopulateIndex();
-            return;
+            return RedirectToAction("Index", "Home");
         }
 
         // Delete the contents of the lucene index 

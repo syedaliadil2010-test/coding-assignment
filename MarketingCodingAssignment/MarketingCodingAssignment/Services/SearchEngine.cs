@@ -10,6 +10,7 @@ using MarketingCodingAssignment.Models;
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Lucene.Net.Analysis.En;
 
 namespace MarketingCodingAssignment.Services
 {
@@ -91,7 +92,7 @@ namespace MarketingCodingAssignment.Services
                     new TextField("Tagline", film.Tagline, Field.Store.YES),
                     new Int64Field("Revenue", film.Revenue ?? 0, Field.Store.YES),
                     new DoubleField("VoteAverage", film.VoteAverage ?? 0.0, Field.Store.YES),
-                    new TextField("CombinedText", film.Title + film.Tagline + film.Overview, Field.Store.NO)
+                    new TextField("CombinedText", film.Title + " " + film.Tagline + " " + film.Overview, Field.Store.NO)
                 };
                 writer.AddDocument(doc);
             }
@@ -122,33 +123,16 @@ namespace MarketingCodingAssignment.Services
             string basePath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             string indexPath = Path.Combine(basePath, "index");
             using FSDirectory dir = FSDirectory.Open(indexPath);
-
-            // Create an analyzer to process the text
-            StandardAnalyzer analyzer = new(AppLuceneVersion);
-
-            // Create an index writer
-            IndexWriterConfig indexConfig = new(AppLuceneVersion, analyzer);
-            using IndexWriter writer = new(dir, indexConfig);
-            using DirectoryReader reader = writer.GetReader(applyAllDeletes: true);
+            using DirectoryReader reader = DirectoryReader.Open(dir);
             IndexSearcher searcher = new(reader);
+
             int hitsLimit = 1000;
             TopScoreDocCollector collector = TopScoreDocCollector.Create(hitsLimit, true);
 
-            // If there's no search string, just return everything.
-            Query pq = new PhraseQuery()
-                {
-                    new Term("CombinedText", searchString.ToLowerInvariant())
-                };
-            Query rq = NumericRangeQuery.NewInt32Range("Runtime", durationMinimum, durationMaximum, true, true);
+            var query = this.GetLuceneQuery(searchString, durationMinimum, durationMaximum, voteAverageMinimum);
 
-            // Apply the filters.
-            BooleanQuery bq = new()
-            {
-                { pq, Occur.MUST },
-                { rq, Occur.MUST }
-            };
+            searcher.Search(query, collector);
 
-            searcher.Search(bq, collector);
             int startIndex = (startPage) * rowsPerPage;
             TopDocs hits = collector.GetTopDocs(startIndex, rowsPerPage);
             ScoreDoc[] scoreDocs = hits.ScoreDocs;
@@ -179,7 +163,35 @@ namespace MarketingCodingAssignment.Services
 
             return searchResults;
         }
+        private Query GetLuceneQuery(string searchString, int? durationMinimum, int? durationMaximum, double? voteAverageMinimum)
+        {
+            if (string.IsNullOrWhiteSpace(searchString))
+            {
+                // If there's no search string, just return everything.
+                return new MatchAllDocsQuery();
+            }
 
+            var pq = new MultiPhraseQuery();
+            foreach (var word in searchString.Split(" ").Where(s => !string.IsNullOrWhiteSpace(s)))
+            {
+                if (!EnglishAnalyzer.DefaultStopSet.Contains(word))
+                {
+                    pq.Add(new Term("CombinedText", word.ToLowerInvariant()));
+                }
+            }
+
+            Query rq = NumericRangeQuery.NewInt32Range("Runtime", durationMinimum, durationMaximum, true, true);
+            Query vaq = NumericRangeQuery.NewDoubleRange("VoteAverage", 0.0, 10.0, true, true);
+
+            // Apply the filters.
+            BooleanQuery bq = new()
+            {
+                { pq, Occur.MUST },
+                { rq, Occur.MUST }
+            };
+
+            return bq;
+        }
     }
 }
 
