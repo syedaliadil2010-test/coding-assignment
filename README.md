@@ -27,7 +27,7 @@ Recommended Tools: Visual Studio 2022, .NET SDK 6.0, GitHub desktop (or other gi
 - Can you use version control correctly?
 - Can you follow instructions and meet scope requirements?
 
-:warning: When you are finished, please update your readme with a description of which features you implemented and any feedback on the test. Then submit the Github link to your finished project to us via email. 
+:warning: When you are finished, please update your readme with a description of which features you implemented and any feedback on the test. Then submit the GitHub link to your finished project to us via email. 
 
 ## Updates: ##
 - 2023-06-08 Added some sample code to serve as a starting point (delete indexed data, index new data, perform simple search on indexed data).
