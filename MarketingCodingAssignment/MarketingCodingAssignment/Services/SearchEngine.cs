@@ -19,10 +19,18 @@ namespace MarketingCodingAssignment.Services
         // The code below is roughly based on sample code from: https://lucenenet.apache.org/
 
         private const LuceneVersion AppLuceneVersion = LuceneVersion.LUCENE_48;
+        private static readonly SearchEngine _searchEngine;
+        static SearchEngine()
+        {
+            // Code to Populate Indexes for First time
+            _searchEngine = new SearchEngine();
+            _searchEngine.DeleteIndex();
+            _searchEngine.PopulateIndexFromCsv();
+        }
 
         public SearchEngine()
         {
-
+            
         }
 
         public List<FilmCsvRecord> ReadFilmsFromCsv()
@@ -79,11 +87,11 @@ namespace MarketingCodingAssignment.Services
             // Create an index writer
             IndexWriterConfig indexConfig = new(AppLuceneVersion, analyzer);
             using IndexWriter writer = new(dir, indexConfig);
-
-            //Add to the index
-            foreach (var film in films)
-            {
-                Document doc = new()
+           
+                //Add to the index
+                foreach (var film in films)
+                {
+                    Document doc = new()
                 {
                     new StringField("Id", film.Id, Field.Store.YES),
                     new TextField("Title", film.Title, Field.Store.YES),
@@ -94,12 +102,13 @@ namespace MarketingCodingAssignment.Services
                     new DoubleField("VoteAverage", film.VoteAverage ?? 0.0, Field.Store.YES),
                     new TextField("CombinedText", film.Title + " " + film.Tagline + " " + film.Overview, Field.Store.NO)
                 };
-                writer.AddDocument(doc);
-            }
+                    writer.AddDocument(doc);
+                }
 
-            writer.Flush(triggerMerge: false, applyAllDeletes: false);
-            writer.Commit();
-
+                writer.Flush(triggerMerge: false, applyAllDeletes: false);
+                writer.Commit();
+                writer.Dispose();
+           
            return;
         }
 
@@ -111,9 +120,9 @@ namespace MarketingCodingAssignment.Services
             using FSDirectory dir = FSDirectory.Open(indexPath);
             StandardAnalyzer analyzer = new(AppLuceneVersion);
             IndexWriterConfig indexConfig = new(AppLuceneVersion, analyzer);
-            using IndexWriter writer = new(dir, indexConfig);
-            writer.DeleteAll();
-            writer.Commit();
+            using IndexWriter writer = new(dir, indexConfig); 
+                writer.DeleteAll();
+                writer.Commit();
             return;
         }
 
