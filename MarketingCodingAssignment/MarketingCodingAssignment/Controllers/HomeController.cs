@@ -28,9 +28,9 @@ namespace MarketingCodingAssignment.Controllers
         }
 
         [HttpGet]
-        public JsonResult Search(string searchString, int start, int rows, int? durationMinimum, int? durationMaximum, double? voteAverageMinimum)
+        public JsonResult Search(string searchString, int start, int rows, int? durationMinimum, int? durationMaximum, double? voteAverageMinimum, DateTime? minDate, DateTime? maxDate)
         {
-            SearchResultsViewModel searchResults = _searchEngine.Search(searchString, start, rows, durationMinimum, durationMaximum, voteAverageMinimum);
+            SearchResultsViewModel searchResults = _searchEngine.Search(searchString, start, rows, durationMinimum, durationMaximum, voteAverageMinimum, minDate, maxDate);
             return Json(new {searchResults});
         }
 

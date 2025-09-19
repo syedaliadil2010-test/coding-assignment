@@ -124,7 +124,9 @@
                 data: {
                     voteAverageMinimum: document.getElementById("voteAverageMinimumFacet").value,
                     durationMinimum: document.getElementById("durationMinimumFacet").value,
-                    durationMaximum: document.getElementById("durationMaximumFacet").value
+                    durationMaximum: document.getElementById("durationMaximumFacet").value,
+                    minDate: document.getElementById("minDateFacet").value,
+                    maxDate: document.getElementById("maxDateFacet").value
                 },
                 success: function (ajaxResponse) {
                     console.log(ajaxResponse);
@@ -167,6 +169,7 @@
                     if (item.runtime) lines.push("<span> " + item.runtime + " minutes</span>");
                     if (item.runtime && item.revenue) lines.push(" | ");
                     if (item.revenue) lines.push("<span>" + item.revenue.toLocaleString("en-US", { style: "currency", currency: "USD" }) + "</span>");
+                    if (item.voteAverage) lines.push(" | <span>" + item.voteAverage + "</span>" );
                     lines.push("</div>");
                 }
 
@@ -267,6 +270,15 @@
                 <option value="10.0">10.0</option>
             </select>
         </div>
+        <div style="display:inline-block;">
+            <label for="minDateFacet">Min ReleaseDate</label>
+            <input class="datefield" data-val="true" style="display: block; width: 150px" id="minDateFacet" name="minDateFacet" type="date" value="01/01/1900" />
+        </div>
+        <div style="display:inline-block;">
+            <label for="maxDateFacet">Max ReleaseDate</label>
+            <input class="datefield" data-val="true" style="display: block; width: 150px" id="maxDateFacet" name="maxDateFacet" type="date" />
+        </div>
+
     </div>
     <div id="results-count" style="margin-top: 30px">
         <span>
